@@ -1,10 +1,20 @@
-# 🏨 Sistema de Gestión de Reservas Hoteleras
+# 🏨 Sistema de Gestión Hotelera - Recepción 2026
 
-Sistema automatizado para la importación, distribución y seguimiento de reservas de hotel en formato Excel.
+Sistema automatizado integral para la gestión de reservas y consumos de hotel.
 
 ## 📋 Descripción
 
-Este repositorio contiene herramientas Python para automatizar la gestión de reservas hoteleras, permitiendo:
+Este repositorio contiene herramientas Python para automatizar la gestión hotelera completa:
+
+### 🍹 Sistema de Consumos (NUEVO)
+- ✅ Registro web de consumos diarios por habitación
+- ✅ 3 categorías: Bebidas, Estadía, Map
+- ✅ Generación automática de reportes Excel (salidas.xlsx)
+- ✅ Validación de habitaciones contra pasajeros activos
+- ✅ Archivo de temporada con backup automático
+- ✅ Interfaz web intuitiva con Bootstrap 5
+
+### 📊 Sistema de Reservas
 - Importar datos desde archivos CSV exportados del sistema de gestión
 - Distribuir automáticamente los pasajeros en las grillas de cada piso
 - Generar estadísticas dinámicas de ocupación
@@ -18,6 +28,65 @@ Este repositorio contiene herramientas Python para automatizar la gestión de re
 - **Total**: 53 habitaciones
 
 ## 🚀 Uso
+
+### Sistema de Consumos (Web App)
+
+#### Inicio Rápido
+
+**Opción 1: Acceso Directo desde Escritorio**
+```bash
+# Doble clic en el icono "Sistema Recepción 2026" del escritorio
+```
+
+**Opción 2: Línea de comandos**
+```bash
+cd /mnt/c/Users/xpabl/OneDrive/Escritorio/recepcion2026
+./iniciar_recepcion.sh
+```
+
+Luego accede desde tu navegador a: **http://localhost:5000**
+
+#### Funcionalidades
+
+**1. Cargar Consumos**
+- Selecciona número de habitación (valida contra pasajeros.csv)
+- Elige categoría: Bebidas, Estadía o Map
+- Ingresa el monto
+- El sistema registra fecha/hora automáticamente
+
+**2. Consulta Diaria (CSV)**
+- Genera tabla pivote con totales por habitación y categoría
+- Descarga: `consulta_consumos_DD-MM-YYYY.csv`
+- Columnas: HAB, Bebidas, Estadía, Map, TOTAL_GENERAL
+
+**3. Generar Salidas XLSX**
+- Genera archivo Excel formato salidas.ods
+- Distribución en columnas por categoría
+- Estructura:
+  - Columna 1: HAB
+  - Columna 2: Estadía  
+  - Columna 3: Map
+  - Columna 4: Bebidas
+  - Columna 5: Forma de pago
+  - Columna 6: Total
+- Descarga: `salidas_DD-MM-YYYY.xlsx`
+
+**4. Ver Consumos**
+- Historial completo de todas las transacciones
+- Filtrable en el navegador
+
+**5. Reiniciar Temporada**
+- Crea backup: `consumos_diarios_BACKUP_DD-MM-YYYY_HH-MM.csv`
+- Limpia la base de datos actual
+- Mantiene estructura para nueva temporada
+
+#### Detener el Servidor
+
+Presiona `Ctrl+C` en la terminal donde está corriendo el servidor.
+
+---
+
+### Sistema de Reservas (Scripts Python)
 
 ### 1. Procesar Reservas
 
@@ -49,7 +118,15 @@ python3 limpiar_grillas_pisos.py
 
 ## 📁 Archivos Principales
 
-### Scripts Python
+### Sistema de Consumos (Web App)
+
+- **`app.py`** - Aplicación Flask principal (servidor web)
+- **`templates/formulario.html`** - Interfaz web del sistema
+- **`iniciar_recepcion.sh`** - Script de inicio automático
+- **`consumos_diarios.csv`** - Base de datos de transacciones
+- **`pasajeros.csv`** - Registro de huéspedes activos (validación)
+
+### Scripts Python de Gestión de Reservas
 
 - **`procesar_reservas.py`** - Script principal de procesamiento de reservas
 - **`limpiar_grillas_pisos.py`** - Script de limpieza y reinicio de grillas
@@ -112,11 +189,23 @@ Las estadísticas se actualizan en cada ejecución y se muestran en la pestaña 
 
 ```bash
 Python 3.10+
+Flask 3.x
+pandas 2.x
 openpyxl 3.1.5+
 ```
 
 ### Instalación de dependencias:
 
+**Sistema de Consumos (recomendado usar entorno virtual):**
+```bash
+# El proyecto ya incluye un entorno virtual configurado en .venv/
+# Si necesitas recrearlo:
+python3 -m venv .venv
+source .venv/bin/activate
+pip install flask pandas openpyxl
+```
+
+**Sistema de Reservas:**
 ```bash
 pip install openpyxl
 ```
@@ -129,6 +218,18 @@ pip install openpyxl
 - El resumen se ubica en PISO 1, 5 filas después del texto "BEBIDAS" (fila 278)
 
 ## 🆕 Changelog
+
+### v4.0 (06/01/2026) - Sistema de Consumos Web
+- ➕ **NUEVO**: Aplicación web Flask para registro de consumos
+- ➕ Formulario intuitivo con validación de habitaciones
+- ➕ 3 categorías: Bebidas, Estadía, Map
+- ➕ Generación de reportes Excel (salidas.xlsx) con columnas separadas
+- ➕ Consulta diaria en CSV con tabla pivote
+- ➕ Función de reinicio de temporada con backup automático
+- ➕ Script de inicio con acceso directo desde escritorio
+- ➕ Interfaz Bootstrap 5 responsive
+- 🔒 Validación contra pasajeros.csv
+- 📊 Historial completo de transacciones
 
 ### v3.0 (29/11/2025)
 - ➕ Resumen estadístico en PISO 1 con 3 métricas
@@ -145,6 +246,17 @@ pip install openpyxl
 ## 📞 Soporte
 
 Para consultas o reportar problemas, crear un issue en el repositorio.
+
+---
+
+## 🎯 Casos de Uso
+
+**Sistema de Consumos**: Ideal para temporada alta (40+ habitaciones) cuando se necesita:
+- Eliminar el procesamiento manual de comandas de papel
+- Consolidar consumos de múltiples días antes del check-out
+- Generar reportes de salida con formato específico (salidas.xlsx)
+
+**Sistema de Reservas**: Gestión de ingresos y distribución de pasajeros en grillas por piso
 
 ---
 
