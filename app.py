@@ -184,29 +184,133 @@ def cierre_xlsx():
 
 @app.route('/ver-consumos')
 def ver_consumos():
-    """Vista de todos los consumos registrados (para control)"""
+    """Vista de todos los consumos registrados con opción de eliminar"""
     if not os.path.exists(DB_CONSUMOS):
-        return "<h3>No hay consumos registrados aún</h3><br><a href='/'>Volver</a>"
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <title>Consumos Registrados</title>
+        </head>
+        <body>
+            <div class="container mt-5">
+                <div class="alert alert-info">
+                    <h3>No hay consumos registrados aún</h3>
+                </div>
+                <a href="/" class="btn btn-primary">Volver al Formulario</a>
+            </div>
+        </body>
+        </html>
+        """
     
     df = pd.read_csv(DB_CONSUMOS)
-    html_table = df.to_html(classes='table table-striped', index=False)
     
-    return f"""
+    # Construir tabla HTML con botón de eliminar
+    html = """
     <!DOCTYPE html>
     <html>
     <head>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <title>Consumos Registrados</title>
+        <script>
+            function confirmarEliminacion(indice) {
+                if (confirm('¿Estás seguro de eliminar este consumo?\\nEsta acción no se puede deshacer.')) {
+                    window.location.href = '/eliminar-consumo/' + indice;
+                }
+            }
+        </script>
+        <style>
+            .btn-eliminar { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
+        </style>
     </head>
     <body>
         <div class="container mt-5">
             <h2>Historial de Consumos</h2>
-            {html_table}
-            <a href="/" class="btn btn-primary mt-3">Volver al Formulario</a>
+            <p class="text-muted">Total de registros: """ + str(len(df)) + """</p>
+            
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Habitación</th>
+                            <th>Pasajero</th>
+                            <th>Categoría</th>
+                            <th>Monto</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    """
+    
+    for idx, row in df.iterrows():
+        html += f"""
+                        <tr>
+                            <td>{idx + 1}</td>
+                            <td>{row['fecha']}</td>
+                            <td>{row['habitacion']}</td>
+                            <td>{row['pasajero']}</td>
+                            <td><span class="badge bg-primary">{row['categoria']}</span></td>
+                            <td>${row['monto']:.2f}</td>
+                            <td>
+                                <button onclick="confirmarEliminacion({idx})" class="btn btn-danger btn-sm btn-eliminar">
+                                    🗑️ Eliminar
+                                </button>
+                            </td>
+                        </tr>
+        """
+    
+    html += """
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-4">
+                <a href="/" class="btn btn-primary">Volver al Formulario</a>
+                <a href="/cierre-dia" class="btn btn-secondary">Descargar CSV</a>
+                <a href="/cierre-xlsx" class="btn btn-success">Descargar Excel</a>
+            </div>
         </div>
     </body>
     </html>
     """
+    
+    return html
+
+@app.route('/eliminar-consumo/<int:indice>')
+def eliminar_consumo(indice):
+    """Eliminar un consumo específico por su índice"""
+    if not os.path.exists(DB_CONSUMOS):
+        flash('No hay consumos para eliminar', 'warning')
+        return redirect('/ver-consumos')
+    
+    try:
+        # Leer el archivo
+        df = pd.read_csv(DB_CONSUMOS)
+        
+        # Verificar que el índice existe
+        if indice < 0 or indice >= len(df):
+            flash(f'❌ Índice inválido: {indice}', 'danger')
+            return redirect('/ver-consumos')
+        
+        # Guardar información del consumo eliminado para mostrar
+        consumo_eliminado = df.iloc[indice]
+        info = f"Hab {consumo_eliminado['habitacion']} - {consumo_eliminado['categoria']} - ${consumo_eliminado['monto']}"
+        
+        # Eliminar la fila
+        df = df.drop(indice)
+        
+        # Guardar el archivo actualizado
+        df.to_csv(DB_CONSUMOS, index=False)
+        
+        flash(f'✅ Consumo eliminado correctamente: {info}', 'success')
+        
+    except Exception as e:
+        flash(f'❌ Error al eliminar consumo: {str(e)}', 'danger')
+    
+    return redirect('/ver-consumos')
 
 @app.route('/reiniciar-temporada', methods=['GET', 'POST'])
 def reiniciar_temporada():
