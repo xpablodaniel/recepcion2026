@@ -2,7 +2,15 @@
 
 Sistema automatizado integral para la gestión de reservas y consumos de hotel.
 
-## 📋 Descripción
+## � Instalación
+
+### Ubuntu Nativo
+Para instalación en Ubuntu nativo con acceso directo en escritorio, consulta: **[INSTALACION_UBUNTU.md](INSTALACION_UBUNTU.md)**
+
+### WSL/Windows
+Sigue las instrucciones de uso en la sección correspondiente más abajo.
+
+## �📋 Descripción
 
 Este repositorio contiene herramientas Python para automatizar la gestión hotelera completa:
 
@@ -38,10 +46,14 @@ Este repositorio contiene herramientas Python para automatizar la gestión hotel
 # Doble clic en el icono "Sistema Recepción 2026" del escritorio
 ```
 
-**Opción 2: Línea de comandos**
+**Opción 2: Script automatizado (Ubuntu Nativo)**
 ```bash
-cd /mnt/c/Users/xpabl/OneDrive/Escritorio/recepcion2026
-./iniciar_recepcion.sh
+./run_hotel.sh  # Crea venv, instala dependencias y abre navegador automáticamente
+```
+
+**Opción 3: Línea de comandos (WSL/Manual)**
+```bash
+./iniciar_recepcion.sh  # Requiere entorno virtual ya configurado
 ```
 
 Luego accede desde tu navegador a: **http://localhost:5000**
